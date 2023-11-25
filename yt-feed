@@ -1,0 +1,13 @@
+#!/bin/bash
+if [ -z "$1" ]; then
+	echo "Usage: $0 [-i] <channel name (no @)>"
+	exit
+elif [[ $1 != -i ]]; then
+	url=$(curl -s "https://validator.w3.org/feed/check.cgi?url=https://youtube.com/@$1" | grep "Validator Results" | sed -n 's/.*Results: \(.*\)<\/title>.*/\1/p')
+	echo $url
+else [ $1 == -i ];
+	url=$(curl -s "https://validator.w3.org/feed/check.cgi?url=https://youtube.com/@$2" | grep "Validator Results" | sed -n 's/.*id=\(.*\)<\/title>.*/\1/p')
+	echo $url
+fi
+
+
