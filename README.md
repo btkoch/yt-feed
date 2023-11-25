@@ -14,7 +14,7 @@ UC4QobU6STFB0P71PMvOGN5A
 The `-r` (reverse) option reverses this behavior: the user inputs a channel ID and the script prints the corresponding channel name.
 
 ```
-$ ytuh UC4QobU6STFB0P71PMvOGN5A
+$ ytuh -r UC4QobU6STFB0P71PMvOGN5A
 jawed
 ```
 
