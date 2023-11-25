@@ -1,0 +1,64 @@
+#!/bin/bash
+
+usage(){
+	echo "Usage: ytuh [-rf] <ARGS>" 
+	echo "options:"
+	echo "     Default: Returns channel ID"
+	echo "r    Reverse: Returns channel name when a channel ID is given (can be used with -f)"
+	echo "f    Feed: Returns RSS feed URL"
+	exit
+}
+
+# Print usage info if no arguments/options
+if [ $# == 0 ]; then
+	usage
+fi
+
+r="0"
+f="0"
+
+# Get ID from name (still called when -r specified, will clean this up later)
+function getId(){
+	if [[ $r == "0" ]]; then
+		id=$(curl -s "https://validator.w3.org/feed/check.cgi?url=https://youtube.com/@$1" | grep "Validator Results" | sed -n 's/.*id=\(.*\)<\/title>.*/\1/p')
+	fi
+}
+
+# Get name from ID (-r specified)
+function reverse() {
+	name="$(curl -Ls https://youtube.com/channel/$1 | grep "canonicalBaseUrl" | sed 's/.*canonicalBaseUrl":"\/@\([^"]*\)".*/\1/')"
+}
+
+# Get feed url (-f specified)
+feed(){
+	feedUrl="https://youtube.com/feeds/videos.xml?channel_id=$id"
+}
+
+while getopts 'r:f:' OPTION; do 
+	case "$OPTION" in
+		r)
+			r="1"
+			id="$2"
+			reverse "$id"
+			;;
+		f)
+			f="1"
+			getId "$OPTARG"
+			feed "$id"
+			;;
+		*)
+			usage
+			;;
+	esac
+done
+
+if [ $r == "1" ] && [ $f == "0" ]; then
+	output="$name"
+elif [ $r == "0" ] && [ $f == "0" ]; then
+	getId "$1"
+	output="$id"
+else
+	output="$feedUrl"
+fi
+
+echo $output
